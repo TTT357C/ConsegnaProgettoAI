@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# Clean previous build
+# Clean previous build and CMake cache files
 rm -rf build
+rm -f CMakeCache.txt
+rm -rf CMakeFiles
+rm -f cmake_install.cmake
 mkdir build
 
 # build exec for cpp

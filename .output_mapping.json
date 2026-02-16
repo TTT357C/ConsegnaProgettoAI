@@ -1,0 +1,5 @@
+{
+  "paris_1_256_250_implemented4_output.json": "example_problems/city.domain/paris_1_256_250.json",
+  "paris_1_256_250_default_output.json": "example_problems/city.domain/paris_1_256_250.json",
+  "sortation_large_2000_implemented4_output.json": "example_problems/warehouse.domain/sortation_large_2000.json"
+}

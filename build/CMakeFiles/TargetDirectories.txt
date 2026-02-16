@@ -1,0 +1,6 @@
+/home/thomas/Documenti/Github/MAPF/ConsegnaProgettoAI/build/CMakeFiles/lifelong_default.dir
+/home/thomas/Documenti/Github/MAPF/ConsegnaProgettoAI/build/CMakeFiles/lifelong_implemented4.dir
+/home/thomas/Documenti/Github/MAPF/ConsegnaProgettoAI/build/CMakeFiles/lifelong.dir
+/home/thomas/Documenti/Github/MAPF/ConsegnaProgettoAI/build/CMakeFiles/clean_all.dir
+/home/thomas/Documenti/Github/MAPF/ConsegnaProgettoAI/build/CMakeFiles/edit_cache.dir
+/home/thomas/Documenti/Github/MAPF/ConsegnaProgettoAI/build/CMakeFiles/rebuild_cache.dir

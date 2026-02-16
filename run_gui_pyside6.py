@@ -252,7 +252,7 @@ class MAPFLauncher(QMainWindow):
         # Planner selection
         config_layout.addWidget(QLabel("Planner:"), 1, 0)
         self.planner_combo = QComboBox()
-        self.planner_combo.addItems(["implemented4", "implemented3", "implemented2", "default"])
+        self.planner_combo.addItems(["implemented4", "default"])
         config_layout.addWidget(self.planner_combo, 1, 1)
         
         # Max timesteps
@@ -265,7 +265,7 @@ class MAPFLauncher(QMainWindow):
         self.output_combo = QComboBox()
         self.output_combo.setMinimumWidth(400)
         config_layout.addWidget(self.output_combo, 3, 1)
-        
+       
         config_group.setLayout(config_layout)
         left_layout.addWidget(config_group)
         
@@ -330,9 +330,11 @@ class MAPFLauncher(QMainWindow):
         
         self.log_text = QTextEdit()
         self.log_text.setReadOnly(True)
+        self.log_text.setMinimumWidth(700)
         log_layout.addWidget(self.log_text)
         
         log_group.setLayout(log_layout)
+        
         right_layout.addWidget(log_group)
         
         # Add left and right widgets to splitter
@@ -700,11 +702,16 @@ class MAPFLauncher(QMainWindow):
             process.wait()
             self.running_processes.remove(process)
             
-            if process.returncode == 0:
+            # Check if compilation actually succeeded by verifying binaries exist
+            impl4_binary = self.workspace_dir / "build" / "lifelong_implemented4"
+            default_binary = self.workspace_dir / "build" / "lifelong_default"
+            
+            if impl4_binary.exists() or default_binary.exists():
                 self.log("✓ Compilation successful")
                 return True
             else:
-                self.log("✗ Compilation failed")
+                self.log("✗ Compilation failed - no binaries created")
+                self.log("  Check the compilation output above for errors")
                 return False
         except Exception as e:
             self.log(f"✗ Error during compilation: {e}")
@@ -749,6 +756,14 @@ class MAPFLauncher(QMainWindow):
                 if not self.compile_code():
                     self.log("✗ Compilation failed")
                     return
+                
+                # Verify binary was created after compilation
+                if not binary_path.exists():
+                    self.log(f"✗ Binary still not found after compilation: {binary_path}")
+                    self.log("✗ Compilation may have failed or binary name mismatch")
+                    return
+                
+                self.log(f"✓ Binary created successfully: {binary_path}")
             
             problem_name = Path(problem_file).stem
             output_file = self.workspace_dir / f"{problem_name}_{planner}_output.json"

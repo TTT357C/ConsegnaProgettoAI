@@ -1,4 +1,30 @@
-# Start-Kit
+# Progetto Intelligenza Artificiale
+
+Il codice implementato si trova nella cartella implemented_planner4.
+
+Altri script utilizzati sono run_gui_pyside6.py (GUI)
+
+# GUI
+
+Il launcher permette di eseguire il codice facilmente ed è stato pensato per utilizzare poche risorse.
+Nel caso la GUI o l'area di terminale risulti troppo piccola è stata pensata per essere "resizable".
+
+# Requisiti
+
+Il codice è stato pensato e testato per funzionare su Ubuntu (Linux), per il funzionamento dell'interfaccia grafica sono richiesti alcuni pacchetti python da installare manualmente.
+
+L'interfaccia grafica poi dovrebbe dare la possibilità di installare il resto (Potrebbero mancare qualche pacchetto da installare manualmente perchè non è stata testata in dettaglio, se la gui da problemi si provi anche la old gui per insttallare i pacchetti). 
+
+Nel caso sia necessario installare qualche pacchetto aggiuntivo in COMANDI.md è fornita una lista di comandi utili a riguardo.
+
+## Autors
+
+- Thomas Causetti (731077)
+- Gabriele Ceresara (729324)
+- Jacopo Tedeschi (722843)
+
+## Start-Kit competizione
+Di seguito in copia il readme della competizione
 
 ## Join the competition
 
