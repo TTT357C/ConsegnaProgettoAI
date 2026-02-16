@@ -1,0 +1,23 @@
+\subsection{Principio di funzionamento}
+Il principio di funzionamento del Large Neighborhood Search (LNS) applicato al Multi-Agent Pathfinding (MAPF) si basa su un approccio metaeuristico che combina distruzione e riparazione iterativa delle soluzioni. L'obiettivo è quello di ottimizzare i percorsi di più agenti in un ambiente condiviso, minimizzando i conflitti e i costi complessivi.
+
+L'algoritmo LNS inizia con una soluzione iniziale, che nel caso di questo progetto viene calcolata utilizzando LaCAM. Successivamente, una parte della soluzione viene distrutta selezionando un sottoinsieme di agenti e rimuovendo i loro percorsi. Questa selezione può essere effettuata utilizzando diverse euristiche, come la scelta casuale, la selezione degli agenti più ritardati o quelli che si trovano in posizioni di conflitto.
+
+Una volta distrutta parzialmente la soluzione, l'algoritmo tenta di ripararla ricalcolando i percorsi per gli agenti selezionati. Questo processo di riparazione utilizza un planner, come il Time-Space A* con consapevolezza delle orientazioni, che considera i vincoli temporali e spaziali per evitare conflitti. L'algoritmo valuta la nuova soluzione e decide se accettarla in base a criteri di ottimalità o accettazione probabilistica.
+
+L'implementazione del LNS è strutturata in diverse componenti principali:
+\begin{itemize}
+    \item \textbf{PathT e PathTableWC}: Queste strutture gestiscono l'occupazione spazio-temporale e il rilevamento dei conflitti. Consentono di registrare e annullare i percorsi degli agenti, verificare blocchi e calcolare conflitti futuri.
+    \item \textbf{ConstraintTable}: Questa classe gestisce i vincoli rigidi e morbidi, come i blocchi di movimento e le penalità, per garantire che i percorsi rispettino i vincoli definiti.
+    \item \textbf{ReservationTable}: Utilizzata per calcolare intervalli di tempo sicuri per gli agenti, considerando i vincoli e i conflitti esistenti.
+    \item \textbf{TimeSpaceAStarPlanner}: Un planner avanzato che utilizza una variante del classico A* per trovare percorsi ottimali minimizzando i conflitti. Tiene conto delle orientazioni degli agenti e dei vincoli temporali.
+    \item \textbf{Parallel LNS}: Una versione parallela dell'algoritmo che sfrutta il calcolo multi-thread per migliorare le prestazioni, suddividendo il problema in sottoproblemi gestiti indipendentemente.
+\end{itemize}
+
+L'algoritmo è stato progettato per essere modulare e flessibile, consentendo di adattare le euristiche di distruzione e riparazione in base alle esigenze specifiche del problema. L'uso di strutture dati efficienti, come le heap per le code di priorità e le tabelle hash per il rilevamento dei conflitti, garantisce prestazioni elevate anche in scenari complessi con molti agenti.
+
+\subsection{Ottimmizzazione}
+Per ottimizzare ulteriormente le prestazioni del LNS si è fatto profiling del codice con perf, per idendificare eventuali colli di bottiglia. L'heap utilizzata per la coda di priorità è stata modificata da una versione 2 heap iniziale a una 4 heap, che ha portato a un miglioramento significativo delle prestazioni. Inoltre, sono state implementate versioni parallele del LNS, sfruttando il calcolo multi-thread per gestire sottoproblemi in modo indipendente, riducendo così i tempi di esecuzione complessivi.
+
+Inoltre si è modificato rispetto a una versione iniziale di LNS la gestione del tempo massimo di esecuzione. Dato che ogni timestep ha un limite di tempo di 1 secondo, inizialmente si impostava un limite di 0.9 secondi per l'esecuzione del LNS. Questa versione funzionava bene per istanze più semplici, ma per istanze più complesse, si notava che l'algoritmo andava in timeout per le prime n iterazioni, stabilizzandosi successivamente. Successivamente, si è capito che per istanze più complesse, il tempo di esecuzione dello scheduler, soprattutto nella fase iniziale, richiedeva più tempo.
+Infine il problema è stato risolto modificando il funzionamento del calcolo del tempo massimo, non più basato su un tempo fisso, ma calcolato dinamicamente in base al tempo impiegato dallo scheduler. In questo modo, se lo scheduler utilizza 0.4 secondi, ad esempio, viene utilizzato il tempo rimantente, ovvero 0.6 secondi, come valore massimo per il calcolo del tempo di esecuzione del LNS. Il tempo di esecuzione verra calcolato utilizzando il cutoff time value presente in config.hpp, che indica quanto tempo, del tempo rimanete, viene utilizzato per esecuzione del LNS. (Il cutoff time è settato a circa 0.9 secondi, dato che si vuole lasciare un margine di tempo per eventuali operazioni di post processing e anche perchè il controllo che ferma l'esecuzione viene lanciato solo ogni n iterazioni altrimenti diventerebbe un collo di bottiglia).

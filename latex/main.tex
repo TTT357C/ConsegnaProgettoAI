@@ -1,0 +1,121 @@
+\documentclass[a4paper, 12pt]{report}
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{amsmath} 
+\usepackage{multirow}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage[left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage{float} 
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{geometry}
+\usepackage{tabularx}
+\usepackage{import}
+\renewcommand\tabularxcolumn[1]{m{#1}}
+%
+\begin{document}
+
+
+
+\begin{titlepage} % Suppresses displaying the page number on the title page and the subsequent page counts as page 1
+	
+	\raggedleft % Right align the title page
+	
+	\rule{1pt}{\textheight} % Vertical line
+	\hspace{0.05\textwidth} % Whitespace between the vertical line and title page text
+	\parbox[b]{0.75\textwidth}{ % Paragraph box for holding the title page text, adjust the width to move the title page left or right on the page
+
+		{\Huge\bfseries Relazione Intelligenza\\[0.4\baselineskip] Artificiale}\\[2\baselineskip] % Title
+		{\large\textit{Università degli studi di Brescia}}\\[4\baselineskip] % Subtitle or further description
+		{\large\textsc{Thomas Causetti 731077\\ Gabriele Ceresara 729324\\ Jacopo Tedeschi \\[0.4\baselineskip]}}% Author name, lower case for consistent small caps
+		
+        \vspace{1cm}
+
+        {\large\textit{A.A. 2025-2026}}\\[4\baselineskip]
+
+		\vspace{0.4\textheight} % Whitespace between the title block and the publisher
+
+		{\noindent Gennaio-Febbraio 2026}\\[\baselineskip] % Publisher and logo
+	}
+
+\end{titlepage}
+%----------------------------------------------------------------------------------------
+\tableofcontents
+\clearpage
+
+\section{Introduzione}
+Questo progetto si basa sull'implementazione di un sistema di Planning per il problema che è stato presentato nella competizione LORR24 (League of Robot Runners 2024) url: \url{https://2024.leagueofrobotrunners.org/}.
+Questa competizione è dedicata al problema del Multi-Agent Path Finding (MAPF) in ambienti dinamici. In questo contesto, più agenti robotici devono navigare in una griglia bidimensionale, evitando collisioni sia di vertice che di spigolo, mentre completano una sequenza di compiti assegnati dinamicamente. Il sistema deve gestire vincoli temporali stringenti, con limiti di tempo per la pianificazione in ogni timestep, e ottimizzare metriche come il tempo di completamento dei compiti e l'efficienza complessiva.
+
+L'approccio implementato in questo progetto è un planner ibrido che combina quattro algoritmi principali: 
+\begin{itemize}
+    \item \textbf{Large Neighborhood Search (LNS)}: ottimizzazione delle traiettorie a lungo termine.
+    \item \textbf{Lazy Constraints Addition Search for MAPF (LaCAM)}: Utilizzato come preprocessing per LNS.
+    \item \textbf{Priority Inheritance with Backtracking (PIBT)}: risoluzione rapida dei conflitti a breve termine. (Solo come fallback in caso di fallimento di LNS)
+    \item \textbf{Rolling Horizon Collision Resolution (RHCR)}: gestione dinamica dei conflitti in tempo reale. (Solo come fallback in caso di fallimento di LNS)
+\end{itemize}
+Utilizzando diversi algoritmi in combinazione, l'implementazione mira ad otternere i vantaggi di ogni metodo, migliorando l'efficacia complessiva del sistema di pianificazione.
+
+Nei capitoli successivi, i 4 diversi algoritmi saranno descritti in dettaglio, insieme alle scelte implementative e alle strategie adottate per affrontare le sfide specifiche del problema MAPF in ambienti dinamici.
+Nel seguito della relazione, descriveremo l'architettura del sistema, i dettagli implementativi, i risultati sperimentali e le valutazioni ottenute nella competizione.
+
+
+\section{Scelta degli algoritmi}
+
+Gli algoritmi scelti per l'implementazione del planner ibrido sono stati selezionati effettuando una valutazione delle varie implementazioni di diversi team della competizione sia nell'anno corrente che in quelli passati.
+Studiando le varie soluzioni proposte, abbiamo notato come l'approccio ibrido che combina più algoritmi abbia portato a risultati migliori rispetto all'utilizzo di un singolo algoritmo. Infine per inplementare il planner abbiamo cercato di capire come implementare gli algoritmi scelti con paper pubblicati in letteratura e con le implementazioni open source disponibili.
+
+
+\section{Preprocessing}
+La competizione fornisce un tempo per il preprocessing, che il nostro planner utilizza per precalcolare le euristiche pesate tra tutte le coppie di posizioni sulla mappa. Questo processo sfrutta una ricerca A* a piu livelli che inizializza rapidamente tutte le euristiche con la distanza di Manhattan, per poi raffinarle progressivamente utilizzando il tempo disponibile. Il calcolo avviene in tre fasi: prima l'inizializzazione con distanza di Manhattan (molto veloce), poi un raffinamento A* senza considerare le rotazioni (più veloce), ed infine un raffinamento completo con A* che considera anche le orientazioni (più accurato). Il preprocessing è parallelizzato con OpenMP per sfruttare al meglio i core disponibili.
+
+Il calcolo è stato fatto a più livelli imitando un pò l'approccio Anytime, perchè dato che il tempo di preprocessing è limitato, e il software successivo necessita di queste euristiche, nei problemi più complessi, il programma non riesce a completare il calcolo di tutte le euristiche, ma riesce comunque a fornire al software successivo delle euristiche iniziali, raffinate per tutto il tempo disponibile. In questo modo, si garantisce la presenza di un euristica e si rende impossibile il timeout del preprocessing, anche in scenari complessi.
+
+Per scenari semplici l'overhead fornito non è notabile, dato che il calcolo è delle euristiche di primo e secondo livello è molto veloce.
+
+\section{Large Neighborhood Search (LNS)}
+\input{lns.tex}
+
+\section{Lazy Constraints Addition Search for MAPF (LaCAM)}
+\input{lacam.tex}
+
+\section{Priority Inheritance with Backtracking (PIBT)}
+\input{pibt.tex}
+
+\section{Rolling Horizon Collision Resolution (RHCR)}
+\input{rhcr.tex}
+
+
+\section{Implementazione e Launcher}
+
+L'implementazione del planner è stata realizzata in C++, per garantire prestazioni migliori rispetto a codice Python.
+
+Per semplificare l'esecuzione del codice, è stato sviluppato un launcher in Python che si occupa di gestire l'esecuzione del planner. Il launcher consente di installare le dipendenze necessarie e il visualizzatore PlanViz. Inoltre, permette di complilare ed eseguire il codice direttamente da GUI. Dall'interfaccia grafica è anche possibile selezionare esecuzioni precedenti e visualizzare il plan su PlanViz.
+
+
+
+\section{Risultati}
+Dato che la competizione è terminata non è stato possibile confrontare i risultati ottenuti con quelli degli altri team, perchè anche se pubblicati, le nostre macchine non possono avere le stesse prestazioni dei server forniti dalla competizione.
+Quindi, un confronto diretto risulterebbe poco significativo.
+
+I risultati sono stati confrontati con il solver che viene fornito dalla competizione.
+
+Il software fornito è un planner basato su PIBT e RHCR, ed è implementato molto bene.
+
+Il nostro planner è risultato essere in grado di risolvere tutti i problemi con un numero di task terminati maggiore rispetto al solver fornito, come visibile nel seguente grafico, che mostra il numero di task completati per ogni problema, confrontando il nostro planner con quello fornito dalla competizione.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{100sec.png}
+    \caption{Confronto del numero di task completati in 100 secondi tra il planner implementato (Implemented4) e il solver di default fornito dalla competizione, con a destra i margini di vantaggio percentuali del nostro planner in ogni problema.}
+    \label{fig:risultati_100sec}
+\end{figure}
+
+\section{Conclusioni}
+
+\end{document}
