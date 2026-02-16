@@ -4,6 +4,10 @@ Il codice implementato si trova nella cartella implemented_planner4.
 
 Altri script utilizzati sono run_gui_pyside6.py (GUI)
 
+# Relazione
+
+[Relazione Intelligenza Artificiale (PDF)](./Relazione%20Intelligenza%20Artificiale.pdf)
+
 # GUI
 
 Il launcher permette di eseguire il codice facilmente ed è stato pensato per utilizzare poche risorse.
