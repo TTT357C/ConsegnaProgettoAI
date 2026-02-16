@@ -13,7 +13,7 @@ Nel caso la GUI o l'area di terminale risulti troppo piccola è stata pensata pe
 
 Il codice è stato pensato e testato per funzionare su Ubuntu (Linux), per il funzionamento dell'interfaccia grafica sono richiesti alcuni pacchetti python da installare manualmente.
 
-L'interfaccia grafica poi dovrebbe dare la possibilità di installare il resto (Potrebbero mancare qualche pacchetto da installare manualmente perchè non è stata testata in dettaglio, se la gui da problemi si provi anche la old gui per insttallare i pacchetti). 
+L'interfaccia grafica poi dovrebbe dare la possibilità di installare il resto (Potrebbe mancare qualche pacchetto da installare manualmente, perchè non è stata testata in dettaglio, se la gui da problemi si provi anche la old_gui). 
 
 Nel caso sia necessario installare qualche pacchetto aggiuntivo in COMANDI.md è fornita una lista di comandi utili a riguardo.
 
@@ -135,8 +135,3 @@ Please refer to the project website for more information. Also the document [Deb
 ## Submission Instruction
 
 Please refer to the [Submission_Instruction.md](./Submission_Instruction.md).
-
-
-
-
-
